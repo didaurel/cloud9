@@ -18,12 +18,22 @@ clone:
 # pipeline =====================================================================
 # ==============================================================================
 pipeline:
+
+#- echo "{\"AWS_ACCESS_KEY_ID\"  \"$AWS_ACCESS_KEY_ID\", \"AWS_SECRET_ACCESS_KEY\" \"$AWS_SECRET_ACCESS_KEY\"}" > test/variables.json"
+  set-default-variables:
+    image: fpfis/httpd-php-dev:5.6
+    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
+    commands:
+      - printf '{"AWS_ACCESS_KEY_ID":"%s", "AWS_SECRET_ACCESS_KEY":"%s", "instance":"%s"}' $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY "small" > test/variables.json
+    when:
+      event: [ push , pull_request ]
+      branch: [master]
+
   test-default:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
-      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=default -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
+      - packer build -var Version=${DRONE_BUILD_NUMBER} -var 'profile=default' -var-file=test/variables.json test/aws.json
     when:
       event: [ push , pull_request ]
       branch: [master]
@@ -31,9 +41,8 @@ pipeline:
   test-docker:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
-      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=docker -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
+      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=docker -var-file=test/variables.json test/aws.json
     when:
       event: [ push , pull_request ]
       branch: [master]
@@ -41,9 +50,8 @@ pipeline:
   test-lamp-56:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
-      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-56 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
+      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-56 -var-file=test/variables.json test/aws.json
     when:
       event: [ push , pull_request ]
       branch: [master]
@@ -51,9 +59,8 @@ pipeline:
   test-lamp-71:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
-      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-71 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
+      - packer build -var Version=${DRONE_BUILD_NUMBER} -var instance=medium -var profile=lamp-71 -var-file=test/variables.json test/aws.json
     when:
       event: [ push , pull_request ]
       branch: [master]
@@ -61,9 +68,8 @@ pipeline:
   test-lamp-72:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
-      - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-72 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
+      - packer build -var Version=${DRONE_BUILD_NUMBER} -var instance=medium -var profile=lamp-72 -var-file=test/variables.json test/aws.json
     when:
       event: [ push , pull_request ]
       branch: [master]
