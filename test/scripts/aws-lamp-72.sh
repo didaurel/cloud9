@@ -28,7 +28,7 @@ redis-cli --version
 #################################
 ###   Check docker services   ###
 #################################
-for url in "phpmyadmin" "maildev" "solr" "selenium"; do
+for url in "phpmyadmin" "maildev" "solr" "selenium" "matomo"; do
   if (( "$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1/$url/")" != "200" )); then
     echo "Fail $url"; exit 76;
   fi;
