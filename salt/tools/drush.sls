@@ -1,9 +1,20 @@
+{% set drush_version = salt['pillar.get']('drush:version', '8.x') %}
+
 # Grab the repo, branch from pillar. Default to 8.x.
 https://github.com/drush-ops/drush.git:
   git.latest:
-    - rev: {{ salt['pillar.get']('drush:version', '8.x') }}
+    - rev: {{ drush_version }}
     - target: /opt/drush
     - force_reset: True
+
+chown_drush_dir:
+  file.directory:
+    - name: '/opt/drush'
+    - group: root
+    - user: ec2-user
+    - recurse:
+      - user
+      - group
 
 /opt/drush:
   composer.installed:
@@ -11,7 +22,8 @@ https://github.com/drush-ops/drush.git:
     - php: /usr/bin/php
     - onchanges:
         - git: https://github.com/drush-ops/drush.git
-
+    - composer_home: /home/ec2-user/.composer
+    - user: ec2-user
 
 # Execute once to make sure requisites are installed
 run-drush:
@@ -20,6 +32,15 @@ run-drush:
     - require:
        - file: /usr/local/bin/drush
     - unless: test -f /opt/drush/testrun
+
+# Drush init
+{% if salt['pkg.version_cmp'](drush_version,'9') == -1 %}
+init-drush:
+  cmd.run:
+    - name: /usr/local/bin/drush init -n
+    - onlyif: test -f /usr/local/bin/drush 
+    - success_retcodes: 75
+{% endif %}
 
 # Drop a symlink for users' paths
 /usr/local/bin/drush:
@@ -34,12 +55,11 @@ run-drush:
     - replace: True
     - user:  ec2-user
     - show_changes: True
-    
-# Get drush registry rebuild command
-install_registry_rebuild:
-  cmd.run:
-    - name: /opt/drush/drush pm-download -y registry_rebuild-7.x
-    - cwd: /
-    - onlyif: test -f /opt/drush/drush
-    - runas:  ec2-user
+
+# Get drush registry rebuild from github
+https://git.drupal.org/project/registry_rebuild.git:
+  git.latest:
+    - rev: 7.x-2.x
+    - target: /home/ec2-user/.drush/registry_rebuild
+    - force_reset: True
     

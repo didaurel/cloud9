@@ -9,6 +9,7 @@ include:
   - lamp.selenium
   - lamp.matomo
   - lamp.bashrc
+  - lamp.redis
 
 /home/ec2-user/environment/index.php:
   file.managed:
