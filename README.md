@@ -20,11 +20,19 @@ Pattern: aws-cloud9-{Cloud9Name}-{Cloud9EnvId}
 Script can be developed and tested on AWS Console > Lambda.
 
 
-## Deployement 
+## Manual Deployement 
 
-Script can be deployed on AWS Console > Lambda or using AWS CLI:
+Create zip package:
+
 ```
-zip -r my_app.zip lambda_function.py
+pip2.7 install -r requirements.txt -t build
+cp lambda_function.py ./build/
+cd build
+zip -r my_app.zip .
+```
+
+Upload zip to lambda function:
+```
 aws lambda update-function-code --function-name "MyLambdaFunctionName" --zip-file fileb://my_app.zip
 ```
 
