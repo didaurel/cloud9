@@ -88,6 +88,7 @@ def tagEC2Instances(event, context):
       new_tags = copy.deepcopy(cur_tags)
       new_tags['Name'] = newName
       new_tags['DG'] = dgName
+      new_tags['Project'] = dgName
         
       # Set tag only if changed
       if new_tags != cur_tags:
@@ -109,6 +110,8 @@ def tagEC2Instances(event, context):
         new_tags = copy.deepcopy(cur_tags)
         new_tags['Name'] = newName
         new_tags['DG'] = dgName
+        new_tags['Project'] = dgName
+        
         # Set tag only if changed
         if new_tags != cur_tags:
           totalVolumeDone +=1
