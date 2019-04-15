@@ -15,7 +15,7 @@ import boto3
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 debugMode = False
 # Pattern used to rename EC2 Instance
@@ -43,8 +43,7 @@ def tagEC2Instances(event, context):
   
   cloud9 = boto3.client('cloud9')
   ec2 = boto3.resource('ec2')
-  
-  #define the connection
+  ec2Client = boto3.client('ec2')
   
   # Pre-load users to avoid 1 call by EC2 instance
   usersByID = getUsersByUserID()
@@ -56,7 +55,7 @@ def tagEC2Instances(event, context):
 
   filters = [{
       'Name': 'tag:Name',
-      'Values': ['aws-cloud9*']
+      'Values': ['aws-cloud9-*']
     },
     {
         'Name': 'instance-state-name', 
@@ -78,10 +77,22 @@ def tagEC2Instances(event, context):
       # Get DG tag from Instance Owner 
       dgName = "undefined"
       EC2CloudOwner = [tag['Value'] for tag in instance.tags if tag['Key'] == 'aws:cloud9:owner']
+
+      # Workaround: Use client.describe_tags to get tags if owner not found
+      # because sometime all tags are not retrieved with instance.tags.
+      if (len(EC2CloudOwner) == 0):
+        logger.warning ('EC2 instance `{0}`: `aws:cloud9:owner` tag not found, try with describe_tags function'.format(instance.instance_id))
+        response = ec2Client.describe_tags(Filters=[{'Name': 'resource-id','Values': [instance.instance_id]}])
+        EC2CloudOwner = [tag['Value'] for tag in response['Tags'] if tag['Key'] == 'aws:cloud9:owner']
+
       if (len(EC2CloudOwner) > 0):
         EC2CloudOwner = EC2CloudOwner[0]
         if (EC2CloudOwner in usersByID):
           dgName = usersByID[EC2CloudOwner]["Tags"]['DG']
+        else:
+          logger.warning ('EC2 instance `{0}`: User `{1}` not found'.format(instance.instance_id, EC2CloudOwner))
+      else:
+        logger.warning ('EC2 instance `{0}`: Tag `aws:cloud9:owner` not found'.format(instance.instance_id))
 
       # Get current tag and add new calculated tags
       cur_tags = boto3_tag_list_to_ansible_dict(instance.tags)
@@ -126,7 +137,7 @@ def tagEC2Instances(event, context):
       
   
   logger.info("End of tag EC2 Instances and volumes.\ntotalInstanceDone: {0}. totalInstanceSkipped: {1}.\n"  
-      "totalInstanceDone: {2}. totalInstanceDone: {3}.".format(totalInstanceDone, totalInstanceSkipped, totalVolumeDone, totalVolumeSkipped) )    
+      "totalVolumeDone: {2}. totalVolumeDone: {3}.".format(totalInstanceDone, totalInstanceSkipped, totalVolumeDone, totalVolumeSkipped) )
 
   return True
   
