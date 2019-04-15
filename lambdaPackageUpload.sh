@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 ZIP_FILE="my_app.zip"
 
