@@ -25,8 +25,11 @@ def lambda_handler(event, context):
 
     # Loop on each environement
     for environmentDescribe in environmentsDescribe['environments']:
-      ownerArn=environmentDescribe['ownerArn']
       cloud9Id=environmentDescribe['id']
+      if 'ownerArn' not in environmentDescribe :
+        logger.warning ("Cloud9 environemnt '{0}' have no ownerArn.".format(cloud9Id))
+        continue
+      ownerArn=environmentDescribe['ownerArn']
       cloud9All[cloud9Id] = environmentDescribe
       
       # Create list by owner

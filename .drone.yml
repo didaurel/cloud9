@@ -3,6 +3,9 @@ pipeline:
     image: python:2.7
     commands:
       - python -m py_compile lambda_function.py
+    when:
+      branch: lambda/*
+      event: [ push , pull_request ]
 
   build-test:
     image: python:2.7
@@ -12,3 +15,28 @@ pipeline:
       - ./lambdaPackageCreate.sh
       - ls build/requests
       - ls my_app.zip
+
+  # Trigger deploy event
+  create-deploy-event:
+    image: fpfis/drone-plugin-github-deploy
+    state: create
+    deploy_environment: ${DRONE_BRANCH#lambda/}
+    secrets: [ github_api_token ]
+    automerge: false
+    when:
+      branch: lambda/*
+      event: [ push ]
+
+  deployment-to-aws:
+    image: mesosphere/aws-cli
+    secrets:
+      - source: AWS_LAMBDA_ACCESS_KEY_ID
+        target: AWS_ACCESS_KEY_ID
+      - source: AWS_LAMBDA_SECRET_ACCESS_KEY
+        target: AWS_SECRET_ACCESS_KEY
+      - source: AWS_DEFAULT_REGION
+        target: AWS_DEFAULT_REGION
+    commands:
+      - ./lambdaPackageUpload.sh ${DRONE_DEPLOY_TO}
+    when:
+      event: [ deployment ]
