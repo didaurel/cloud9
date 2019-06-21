@@ -2,6 +2,7 @@ import boto3
 ec2R = boto3.resource('ec2')
 ec2 = boto3.client('ec2')
 c9 = boto3.client('cloud9')
+
 from botocore.exceptions import ClientError
 
 import logging
@@ -16,6 +17,7 @@ if (debugMode):
   DRYRUN = True
 
 EBS_SIZE = 20
+EBS_SIZE_DG = {'EAC': 40}
 
 def lambda_handler(event, context):
   if (event['detail']['event'] == "createVolume" ):
@@ -50,8 +52,30 @@ def lambda_handler(event, context):
           break;
           
       if isC9:
+        # Call tagEC2InstancesAndVolumes lambda to have DG tag available
+        lambdaC = boto3.client('lambda')
+        response = lambdaC.invoke(
+          FunctionName='tagEC2InstancesAndVolumes',
+          InvocationType='RequestResponse',
+          Payload='{"instanceId" : "'+ EC2Id +'"}'
+        )
+        logger.info("tagEC2InstancesAndVolumes called for EC2Id '{0}'. Response: {1}".format(EC2Id, response) )
+        # Reload volume after tagging
+        volume = ec2R.Volume(volumeID)
+
+        # Get DG tag of volume
+        for tags in volume.tags:
+          if tags["Key"] == 'DG':
+            tagDG = tags["Value"]
+
+        # Get new size by DG
+        newSize = EBS_SIZE
+        if tagDG in EBS_SIZE_DG:
+          newSize=EBS_SIZE_DG[tagDG]
+          logger.info("Volume {0} have DG '{1}', resize value: {2}Go".format(volumeID, tagDG, newSize) )
+
         curSize = volume.size
-        if curSize >= EBS_SIZE:
+        if curSize >= newSize:
         # Size Ok, skip
           logger.info("Volume {0} skipped: size OK: {1}Go".format(volumeID, curSize) )
         else:
@@ -61,7 +85,7 @@ def lambda_handler(event, context):
             response = ec2.modify_volume(
                 DryRun=DRYRUN,
                 VolumeId=volumeID,
-                Size=EBS_SIZE
+                Size=newSize
             )
           except ClientError as e:
             logger.debug(e)
@@ -69,10 +93,10 @@ def lambda_handler(event, context):
             logger.error("Volume {0} failed: ClientError Exception: {1}".format(volumeID, e))
             return False
           if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            logger.info("Volume {0} updated: size changed from {1}Go to {2}Go".format(volumeID, curSize, EBS_SIZE))
+            logger.info("Volume {0} updated: size changed from {1}Go to {2}Go".format(volumeID, curSize, newSize))
             return True
           else:
-            logger.error("Volume {0} failed: Target {1}Go, Current Size: {2}. Responde: {3}".format(volumeID, EBS_SIZE,curSize, response))
+            logger.error("Volume {0} failed: Target {1}Go, Current Size: {2}. Responde: {3}".format(volumeID, newSize,curSize, response))
       else:
         logger.info("Volume {0} skipped: not cloud9 environment".format(volumeID))
   return False

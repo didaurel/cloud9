@@ -11,3 +11,28 @@ pipeline:
       - apt-get install zip --yes
       - ./lambdaPackageCreate.sh
       - ls my_app.zip
+
+  # Trigger deploy event
+  create-deploy-event:
+    image: fpfis/drone-plugin-github-deploy
+    state: create
+    deploy_environment: ${DRONE_BRANCH#lambda/}
+    secrets: [ github_api_token ]
+    automerge: false
+    when:
+      branch: lambda/resizeEC2Volume
+      event: [ push ]
+
+  deployment-to-aws:
+    image: mesosphere/aws-cli
+    secrets:
+      - source: AWS_LAMBDA_ACCESS_KEY_ID
+        target: AWS_ACCESS_KEY_ID
+      - source: AWS_LAMBDA_SECRET_ACCESS_KEY
+        target: AWS_SECRET_ACCESS_KEY
+      - source: AWS_DEFAULT_REGION
+        target: AWS_DEFAULT_REGION
+    commands:
+      - ./lambdaPackageUpload.sh ${DRONE_DEPLOY_TO}
+    when:
+      event: [ deployment ]
