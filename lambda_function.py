@@ -15,7 +15,7 @@ import boto3
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 debugMode = False
 # Pattern used to rename EC2 Instance
@@ -23,18 +23,26 @@ EC2InstanceNamePattern = 'aws-cloud9-{Cloud9Name}-{Cloud9EnvId}'
 
 if (debugMode):
   logger.setLevel(logging.DEBUG)
-     
+
 def lambda_handler(event, context):
   logger.debug("boto3 version:"+boto3.__version__)
   logger.debug("botocore version:"+botocore.__version__)
 
-  tagEC2Instances(event, context);
-  # Tag volume separatly 
-  tagUnusedEC2Volumes(event, context);
+  instanceId = None
+  if 'instanceId' in event:
+    instanceId = event['instanceId']
+    logger.debug("Instance ID provided: " + instanceId)
+
+  tagEC2Instances(instanceId, context);
+
+  # Tag Unused volume separatly
+  if instanceId == None:
+    tagUnusedEC2Volumes(event, context);
+
   return 'Done'
 
 # Rename EC2 instance of cloud9 environements
-def tagEC2Instances(event, context):
+def tagEC2Instances(instanceId, context):
   logger.info('Start tag EC2 Instances and volumes...')
   totalInstanceDone = 0
   totalInstanceSkipped = 0
@@ -53,15 +61,24 @@ def tagEC2Instances(event, context):
   for vol in ec2.volumes.filter(Filters=[{'Name': 'status','Values': ['in-use', 'creating']}], MaxResults=50): 
     volumes[vol.volume_id] = vol
 
-  filters = [{
-      'Name': 'tag:Name',
-      'Values': ['aws-cloud9-*']
-    },
-    {
+  # if None, tag all instances
+  if instanceId == None:
+    filters = [{
+        'Name': 'tag:Name',
+        'Values': ['aws-cloud9-*']
+      },
+    ]
+  else:
+    filters=[{
+      'Name': 'instance-id',
+      'Values': [instanceId]
+    }]
+
+  filters.append({
         'Name': 'instance-state-name', 
         'Values': ['pending','running','shutting-down','stopping','stopped']
-    }
-  ]
+  })
+
   for instance in ec2.instances.filter(Filters=filters, MaxResults=50):
     logger.debug("--------------------------------------------------------")
     logger.debug("EC2 Instance `" + instance.instance_id + "`: start update tags `name`, `DG`...")
