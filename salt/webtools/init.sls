@@ -15,3 +15,18 @@ mysql-client:
     - group: ec2-user
     - require: 
       - file: /mnt/docker
+stop-containers:
+  cmd.run:
+    - name: |
+        cd /mnt/docker
+        /usr/local/bin/docker-compose down
+    - onlyif: test `docker ps | wc -l` -gt 1
+    - require:
+      - file: /mnt/docker/docker-compose.yml
+start-containers:
+  cmd.run:
+    - name: |
+        cd /mnt/docker
+        /usr/local/bin/docker-compose up -d
+    - require:
+      - file: /mnt/docker/docker-compose.yml
