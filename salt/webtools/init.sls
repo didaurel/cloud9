@@ -7,7 +7,7 @@ mysql-client:
     - user:  ec2-user
     - group: ec2-user
     - name:  /mnt/docker
-/mnt/docker/docker-compose.yml:
+/mnt/docker/webtools-docker-compose.yml:
   file.managed:
     - template: jinja
     - source: salt://webtools/files/docker-compose.yml
@@ -15,18 +15,9 @@ mysql-client:
     - group: ec2-user
     - require: 
       - file: /mnt/docker
-stop-containers:
-  cmd.run:
-    - name: |
-        cd /mnt/docker
-        /usr/local/bin/docker-compose down
-    - onlyif: test `docker ps | wc -l` -gt 1
-    - require:
-      - file: /mnt/docker/docker-compose.yml
 start-containers:
   cmd.run:
     - name: |
-        cd /mnt/docker
-        /usr/local/bin/docker-compose up -d
+        /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml up -d --force-recreate
     - require:
-      - file: /mnt/docker/docker-compose.yml
+      - file: /mnt/docker/webtools-docker-compose.yml
