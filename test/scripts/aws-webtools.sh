@@ -26,7 +26,7 @@ if [ "$fail" == "true" ]; then
   exit 57
 fi
 
-sleep 10
+sleep 120
 
 #################################
 ###   Check services   ###
