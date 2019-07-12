@@ -31,7 +31,7 @@ novnc:
   docker_container.running:
     - image: dougw/novnc
     - port_bindings:
-      - 8081:8081
+      - 8086:8081
     - environment:
       - REMOTE_HOST = {{ grains['ip_interfaces']['eth0'][0] }}
     - watch_action: SIGHUP
