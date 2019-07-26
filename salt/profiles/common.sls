@@ -1,5 +1,6 @@
 include:
   - config.authorized_keys
+  - commands.expandFS
   - config.bashrc
   - config.tmux
   - config.swap
