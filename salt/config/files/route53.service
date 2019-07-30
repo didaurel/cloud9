@@ -1,0 +1,63 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          mattermost
+# Required-Start:    $network $syslog
+# Required-Stop:     $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: route53 reverse DNS (no-ip equivalent)
+# Description:       this service allow to user to use reverse DNS to access to the C9 instances.
+### END INIT INFO
+
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+CHUSER=ec2-user
+NAME=route53
+DESC="this service allow to user to use reverse DNS to access to the C9 instances."
+SCRIPTNAME=/etc/init.d/$NAME
+
+. /etc/rc.d/init.d/functions
+
+start()
+{
+    echo -n "Starting $NAME..."
+    if [[ `http://169.254.169.254/latest/meta-data/security-groups` =~ CLOUD9-COMMON-SG ]]
+    then
+        su $CHUSER -s /bin/bash -c 'aws route53 change-resource-record-sets --hosted-zone-id Z2F2AI8AYPIBEO --change-batch "{
+          \"Changes\": [
+            {
+              \"Action\": \"UPSERT\",
+              \"ResourceRecordSet\": {
+                \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" | egrep -o "devs-[^-]+" | uniq`.c9.fpfis.eu\",
+                \"Type\": \"A\",
+                \"TTL\": 300,
+                \"ResourceRecords\": [{ \"Value\": \"`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`\" }]
+              }
+            }
+          ]
+        }"' > /dev/null
+    else
+        echo -n "Ignoring start because c9 account not detected."
+    fi
+    if [ "$?" -ne 0 ]
+    then
+        failure
+        echo
+        RETVAL=1
+    else
+        success
+        echo
+        RETVAL=0
+    fi
+}
+
+case "$1" in
+start)
+    start
+;;
+*)
+        echo "Usage: $0 start"
+        exit 3
+esac
+
+exit $RETVAL

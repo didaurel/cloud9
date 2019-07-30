@@ -11,6 +11,7 @@ include:
   - tools.drone
   - frp
   - config.setSaltMinionID
+  - config.route53
   - commands.dockerPrune
 
 /home/ec2-user/environment/.c9/salt/:
