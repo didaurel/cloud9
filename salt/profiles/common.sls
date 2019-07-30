@@ -4,6 +4,7 @@ include:
   - config.bashrc
   - config.tmux
   - config.swap
+  - config.route53
   - cloud9.runners
   - cloud9.init-js
   - cloud9.c9-js
