@@ -21,7 +21,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 start()
 {
     echo -n "Starting $NAME..."
-    if [[ `http://169.254.169.254/latest/meta-data/security-groups` =~ CLOUD9-COMMON-SG ]]
+    if [[ `curl -s http://169.254.169.254/latest/meta-data/security-groups` =~ CLOUD9-COMMON-SG ]]
     then
         su $CHUSER -s /bin/bash -c 'aws route53 change-resource-record-sets --hosted-zone-id Z2F2AI8AYPIBEO --change-batch "{
           \"Changes\": [
@@ -30,7 +30,7 @@ start()
               \"ResourceRecordSet\": {
                 \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" | egrep -o "devs-[^-]+" | uniq`.c9.fpfis.eu\",
                 \"Type\": \"A\",
-                \"TTL\": 300,
+                \"TTL\": 10,
                 \"ResourceRecords\": [{ \"Value\": \"`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`\" }]
               }
             }
