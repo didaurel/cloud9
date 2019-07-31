@@ -28,7 +28,7 @@ start()
             {
               \"Action\": \"UPSERT\",
               \"ResourceRecordSet\": {
-                \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" | egrep -o "devs-[^-]+" | uniq`.c9.fpfis.eu\",
+                \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" | egrep -o "aws-cloud9-[a-zA-Z0-9]+-[^-]+" | sed "s/aws-cloud9-//" | tr "[:upper:]" "[:lower:]" | uniq`.c9.fpfis.eu\",
                 \"Type\": \"A\",
                 \"TTL\": 10,
                 \"ResourceRecords\": [{ \"Value\": \"`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`\" }]
