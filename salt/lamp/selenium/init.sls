@@ -9,7 +9,7 @@ selenium/standalone-chrome-debug:
 
 selenium:
   docker_container.running:
-    - image: selenium/standalone-chrome-debug
+    - image: selenium/standalone-chrome-debug:3.141.5
     - port_bindings:
       - 4444:4444
       - 5900:5900
