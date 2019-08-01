@@ -5,6 +5,7 @@
 # Required-Stop:     $network $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
+# chkconfig: - 99 0
 # Short-Description: route53 reverse DNS (no-ip equivalent)
 # Description:       this service allow to user to use reverse DNS to access to the C9 instances.
 ### END INIT INFO
