@@ -6,6 +6,6 @@ include:
   - cloud9.runners
   - cloud9.init-js
   - cloud9.c9-js
-  - tools.drone
   - frp
   - config.setSaltMinionID
+  - config.route53
