@@ -16,6 +16,7 @@ CHUSER=ec2-user
 NAME=route53
 DESC="this service allow to user to use reverse DNS to access to the C9 instances."
 SCRIPTNAME=/etc/init.d/$NAME
+C9_ROLE_ARN="arn:aws:iam::469132580751:role/Cloud9Role"
 
 . /etc/rc.d/init.d/functions
 
@@ -24,19 +25,21 @@ start()
     echo -n "Starting $NAME..."
     if [[ `curl -s http://169.254.169.254/latest/meta-data/security-groups` =~ CLOUD9-COMMON-SG ]]
     then
+        su $CHUSER -s /bin/bash -c "aws configure list --profile Cloud9Role" 2&>1 /dev/null || su $CHUSER -s /bin/bash -c "aws configure set region eu-west-1 --profile Cloud9Role" > /dev/null
+        su $CHUSER -s /bin/bash -c "aws sts assume-role --role-arn ${C9_ROLE_ARN} --role-session-name Cloud9Role --profile Cloud9Role" > /dev/null
         su $CHUSER -s /bin/bash -c 'aws route53 change-resource-record-sets --hosted-zone-id Z2F2AI8AYPIBEO --change-batch "{
           \"Changes\": [
             {
               \"Action\": \"UPSERT\",
               \"ResourceRecordSet\": {
-                \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" | egrep -o "aws-cloud9-[a-zA-Z0-9]+-[^-]+" | sed "s/aws-cloud9-//" | tr "[:upper:]" "[:lower:]" | uniq`.c9.fpfis.eu\",
+                \"Name\": \"`aws ec2 describe-tags --filters "Name=resource-id,Values=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)" --profile Cloud9Role | sed -nr "s/.*aws-cloud9-([a-z0-9-]+)-[a-f0-9]{32}.*/\L\1/pi" | uniq`.c9.fpfis.eu\",
                 \"Type\": \"A\",
                 \"TTL\": 10,
                 \"ResourceRecords\": [{ \"Value\": \"`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`\" }]
               }
             }
           ]
-        }"' > /dev/null
+        }" --profile Cloud9Role' > /dev/null
     else
         echo -n "Ignoring start because c9 account not detected."
     fi
