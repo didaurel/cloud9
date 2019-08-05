@@ -1,3 +1,11 @@
 include:
   - config.authorized_keys
   - commands.expandFS
+  - config.bashrc
+  - config.swap
+  - cloud9.runners
+  - cloud9.init-js
+  - cloud9.c9-js
+  - tools.drone
+  - frp
+  - config.setSaltMinionID
