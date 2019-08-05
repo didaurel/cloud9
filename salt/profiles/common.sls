@@ -1,17 +1,9 @@
 include:
   - config.authorized_keys
   - commands.expandFS
-  - config.bashrc
   - config.tmux
-  - config.swap
-  - cloud9.runners
-  - cloud9.init-js
-  - cloud9.c9-js
   - docker
   - tools.drone
-  - frp
-  - config.setSaltMinionID
-  - config.route53
   - commands.dockerPrune
 
 /home/ec2-user/environment/.c9/salt/:
