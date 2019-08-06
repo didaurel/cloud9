@@ -1,6 +1,7 @@
 expandFS:
   cmd.run:
     - name: |
-        DEV=`sudo fdisk -l | egrep -o "/dev[^:]+" | head -n 1` 
-        sudo growpart ${DEV} 1
-        sudo resize2fs ${DEV}1
+        DISK=`sudo fdisk -l | egrep -o "/dev[^:]+" | head -n 1`
+        PART=`sudo df -h / | egrep -o "/dev[^ ]+" | head -n 1` 
+        sudo growpart ${DISK} 1
+        sudo resize2fs ${PART}
