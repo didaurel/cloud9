@@ -1,7 +1,3 @@
-mysql-client:
-  pkg.latest:
-    - pkgs:
-      - mysql{{ salt['pillar.get']('webtools:mysql_version','latest')|replace(".", "") }}
 /mnt/docker:
   file.directory:
     - user:  ec2-user

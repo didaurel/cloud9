@@ -17,30 +17,60 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - elasticsearch-log:/var/log/elasticsearch
-      - elasticsearch-data:/usr/share/elasticsearch/data
-      
+      - /mnt/docker/logs/elasticsearch:/var/log/elasticsearch
+      - /mnt/docker/datas/elasticsearch:/usr/share/elasticsearch/data
   cerebro:
     image: yannart/cerebro:latest
     container_name: cerebro
     ports:
       - 9000:9000
-
-  #Mysql 
-  mysql:
-    image: mysql:{{ salt['pillar.get']('webtools:mysql_version','latest') }}
-    container_name: mysql{{ salt['pillar.get']('webtools:mysql_version','latest') }}
+  web:
+    image: fpfis/httpd-php:72-wt
+    container_name: web
+    environment:
+      - ALLOWOVERRIDE=All
+      - PHP_DISPLAY_ERRORS=On
+    depends_on:
+      - mysql
     ports:
-      - 3306:3306
+      - 8080:8080
+    volumes:
+      - /mnt/docker/logs/httpd:/var/log
+      - /home/ec2-user/environment:/var/www/html
+      - /mnt/docker/tmp/composer:/cache
+    restart: always
+  mysql:
+    image: mysql/mysql-server:5.7
+    container_name: mysql
+    command: --innodb-file-per-table=1 --innodb-log-file-size=1G --optimizer-switch=condition_fanout_filter=off --query-cache-size=128M --query-cache-limit=16M --collation-server=utf8mb4_general_ci --max-join-size=1000000000 --innodb-buffer-pool-instances=8 --innodb-buffer-pool-size=1G --join-buffer-size=2M --key-buffer-size=64M --net-buffer-length=16384 --read-buffer-size=2M --read-rnd-buffer-size=4M --sort-buffer-size=8M --wait-timeout=2880 --thread-cache-size=64 --max-allowed-packet=32M --group-concat-max-len=1000000 --table-open-cache=22000 --character-set-server=utf8mb4 --long-query-time=10 --slow-query-log=1 --explicit_defaults_for_timestamp=ON
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_ROOT_HOST=%
+      - TZ=Europe/Luxembourg
+    ports:
+      - 3306:3306
     volumes:
-      - mysql-data:/var/lib/mysql
-    
-volumes:
-  elasticsearch-log:
-  elasticsearch-data:
-  mysql-data:
-
-      
+      - /mnt/docker/datas/mysql57:/var/lib/mysql
+    restart: always
+  memcached:
+    image: memcached:1.4.21
+    container_name: memcached
+    command: memcached -m 64
+    ports:
+      - 11211:11211
+    restart: always
+  cypress:
+    image: cypress/browsers:chrome67
+    container_name: cypress
+    volumes:
+      - /mnt/docker/tmp/node/cache:/root/.npm
+      - /mnt/docker/tmp/node/cypress:/root/.cache
+      - /home/ec2-user/environment:/var/www/html
+    tty: true
+    restart: always
+  node:
+    image: fpfis/nodejs:10-wt
+    container_name: node
+    volumes:
+      - /home/ec2-user/environment/euwebtoolsws:/opt/nodejs
+      - /mnt/docker/logs/node:/var/log
