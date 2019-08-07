@@ -1,9 +1,8 @@
 version: '3'
 services:
-  # Elasticsearch cluster
   elasticsearch:
-    image: elasticsearch:{{ salt['pillar.get']('webtools:elasticsearch_version','latest') }}
-    container_name: elasticsearch1
+    image: elasticsearch:6.8.2
+    container_name: elasticsearch
     environment:
       - cluster.name=webtools-dev-cluster
       - node.name=webtools-node1
