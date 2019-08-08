@@ -13,7 +13,7 @@
   file.directory:
     - user:  ec2-user
     - group: ec2-user
-/mnt/docker/datas/elasticsearch
+/mnt/docker/datas/elasticsearch:
   file.directory:
     - user:  1000
 /mnt/docker/logs/elasticsearch:
@@ -29,7 +29,6 @@
       - file: /mnt/docker/datas
 start-containers:
   cmd.run:
-    - name: |
-        /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml up -d --force-recreate
+    - name: /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml up -d --force-recreate
     - require:
       - file: /mnt/docker/webtools-docker-compose.yml

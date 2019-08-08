@@ -31,7 +31,7 @@ sleep 120
 #################################
 ###   Check services   ###
 #################################
-for service in "elasticsearch:9200" "cerebro:9000" ; do
+for service in "elasticsearch:9200" "cerebro:9000" "httpd-php:8080"; do
   app=`echo $service |cut -d ':' -f1`
   if (($(docker ps |grep $app |wc -l) != "0")); then
     port=`echo $service |cut -d ':' -f2`
@@ -43,7 +43,16 @@ for service in "elasticsearch:9200" "cerebro:9000" ; do
   fi
 done
 
-if (($(docker ps |grep mysql |wc -l) != "0")); then
+if (($(docker ps | grep memcached | wc -l) != "0")); then
+  nc -z 127.0.0.1 11211
+  if (("$?" == "1")); then
+    echo "Fail to connect : memcached)"; exit 76
+  fi
+else
+  echo "Fail to start container : memcached"; exit 71
+fi
+
+if (($(docker ps | grep mysql | wc -l) != "0")); then
   mysql -u root -h 127.0.0.1 -e "SHOW DATABASES;" > /dev/null
   if (("$?" == "1")); then
     echo "Fail to connect : mysql (mysql -u root -h 127.0.0.1)"; exit 76
