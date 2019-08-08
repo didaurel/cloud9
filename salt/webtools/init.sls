@@ -3,6 +3,10 @@
     - user:  ec2-user
     - group: ec2-user
     - name:  /mnt/docker
+/mnt/docker/datas/elasticsearch:
+  file.directory:
+    - user:  1000
+    - name:  /mnt/docker/datas/elasticsearch
 /mnt/docker/webtools-docker-compose.yml:
   file.managed:
     - template: jinja
