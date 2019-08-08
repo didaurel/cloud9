@@ -1,12 +1,24 @@
-/mnt/docker:
+/mnt/docker/datas:
   file.directory:
     - user:  ec2-user
     - group: ec2-user
-    - name:  /mnt/docker
-/mnt/docker/datas/elasticsearch:
+    - dir_mode: 2755
+    - name:  /mnt/docker/datas
+    - makedirs: true
+    - recurse:
+      - user
+      - group
+      - mode
+/mnt/docker/logs:
+  file.directory:
+    - user:  ec2-user
+    - group: ec2-user
+/mnt/docker/datas/elasticsearch
   file.directory:
     - user:  1000
-    - name:  /mnt/docker/datas/elasticsearch
+/mnt/docker/logs/elasticsearch:
+  file.directory:
+    - user:  1000
 /mnt/docker/webtools-docker-compose.yml:
   file.managed:
     - template: jinja
@@ -14,7 +26,7 @@
     - user:  ec2-user
     - group: ec2-user
     - require: 
-      - file: /mnt/docker
+      - file: /mnt/docker/datas
 start-containers:
   cmd.run:
     - name: |
