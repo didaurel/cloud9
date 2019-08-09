@@ -30,6 +30,7 @@ services:
     environment:
       - ALLOWOVERRIDE=All
       - PHP_DISPLAY_ERRORS=On
+      - ENVIRONMENT=dev
     depends_on:
       - mysql
     ports:
