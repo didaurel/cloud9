@@ -25,6 +25,9 @@ mysql:
 nodejs:
    version: 10
 
+tika:
+  version: 1.5
+
 docker:
   version : ""
   docker-compose:

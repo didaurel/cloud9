@@ -24,3 +24,23 @@ ApacheSolr:
       - service: httpd
     - require:
       - httpd24
+
+{% set tika_version = salt['pillar.get']('tika:version', "1.5") %}
+# Tika from archive:
+# https://archive.apache.org/dist/tika/
+/home/ec2-user/environment/.c9/tika/tika-app-{{ tika_version }}.jar:
+  file.managed:
+    - source: http://archive.apache.org/dist/tika/tika-app-{{ tika_version }}.jar
+    - source_hash: https://archive.apache.org/dist/tika/tika-app-{{ tika_version }}.jar.md5
+    - makedirs: true
+    - user: ec2-user
+    - group: ec2-user
+
+# Tika symlink:
+tika_symlink:
+  file.symlink:
+    - name: /home/ec2-user/environment/.c9/tika/tika-app-current.jar
+    - target: /home/ec2-user/environment/.c9/tika/tika-app-{{ tika_version }}.jar
+    - onlyif: "test ! -d /home/ec2-user/environment/.c9/tika/tika-app-{{ tika_version }}.jar"
+    - user: ec2-user
+    - group: ec2-user
