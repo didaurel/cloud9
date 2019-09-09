@@ -1,8 +1,8 @@
+#!/bin/sh -e
+
 # Install salt stack minion for local usage.
 # Script used by packer for testing.
 # (equivalent to install-minion-Cloud9.sh for developer)
-
-#!/bin/sh -x
 
 # Start FRP srv for test
 sleep 5
@@ -35,8 +35,8 @@ sudo grep -q "service: rh_service" /etc/salt/minion || echo -e "providers:\n  se
 sudo service salt-minion restart
 
 # Start default commands
-sudo salt-call state.apply commands.expandFS --local
-sudo salt-call state.apply --local
+sudo salt-call --retcode-passthrough  state.apply commands.expandFS --local
+sudo salt-call --retcode-passthrough  state.apply --local
 
 # Setup aws credentials for aws-cli usage
 mkdir -p ~/.aws
