@@ -28,7 +28,7 @@ services:
     image: fpfis/httpd-php:72-wt
     container_name: web
     environment:
-      - ALLOWINDEXES=Indexes
+      - ALLOWINDEXES=+Indexes
       - ALLOWOVERRIDE=All
       - PHP_DISPLAY_ERRORS=On
       - ENVIRONMENT=dev
