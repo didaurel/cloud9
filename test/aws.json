@@ -21,6 +21,7 @@
     "ami_name": "aws-cloud9-packer-build-{{user `profile`}}",
     "ami_description": "drone build {{user `Version`}}",
     "security_group_id" : "sg-004f43eec5a463676",
+    "iam_instance_profile" : "Cloud9Role",
     "run_tags": {
       "Name": "packer-build-{{user `profile`}}"
     }
