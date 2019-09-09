@@ -42,13 +42,4 @@ sudo salt-call state.apply --local
 mkdir -p ~/.aws
 rm -Rf ~/.aws/credentials
 
-FILE="/home/ec2-user/.aws/credentials"
-/bin/cat <<EOM >$FILE
-[default]
-aws_access_key_id=$1
-aws_secret_access_key=$2
-region=eu-west-1
-EOM
-
-
 

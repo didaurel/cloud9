@@ -30,7 +30,6 @@ pipeline:
   test-default:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=default -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
@@ -40,7 +39,6 @@ pipeline:
   test-docker:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=docker -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
@@ -50,7 +48,6 @@ pipeline:
   test-lamp-56:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-56 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
@@ -70,7 +67,6 @@ pipeline:
   test-lamp-72:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-72 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
@@ -80,7 +76,6 @@ pipeline:
   test-lamp-73:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var profile=lamp-73 -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
@@ -100,7 +95,6 @@ pipeline:
   test-webtools:
     group: test
     image: fpfis/drone-plugin-packer
-    secrets: [ AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY ]
     commands:
       - packer build -var Version=${DRONE_BUILD_NUMBER} -var instance=medium -var profile=webtools -var AWS_AKI=$AWS_ACCESS_KEY_ID -var AWS_SAK=$AWS_SECRET_ACCESS_KEY test/aws.json
     when:
