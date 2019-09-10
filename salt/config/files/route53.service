@@ -23,7 +23,7 @@ C9_ROLE_ARN="arn:aws:iam::469132580751:role/Cloud9Role"
 start()
 {
     echo -n "Starting $NAME..."
-    if [[ `curl -s http://169.254.169.254/latest/meta-data/iam/info` =~ instance-profile/Cloud9Role ]]
+    if [[ `curl -s http://169.254.169.254/latest/meta-data/iam/info` =~ instance-profile/Cloud9Role && `curl -s http://169.254.169.254/latest/meta-data/security-groups` =~ CLOUD9-COMMON-SG ]]
     then
         su $CHUSER -s /bin/bash -c "aws configure list --profile Cloud9Role" 2&>1 /dev/null || su $CHUSER -s /bin/bash -c "aws configure set region eu-west-1 --profile Cloud9Role" > /dev/null
         su $CHUSER -s /bin/bash -c "aws sts assume-role --role-arn ${C9_ROLE_ARN} --role-session-name Cloud9Role --profile Cloud9Role" > /dev/null
