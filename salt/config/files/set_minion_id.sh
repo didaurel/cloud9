@@ -1,8 +1,9 @@
 #!/bin/bash
 
-sleep 60
-
 export HOME="/home/ec2-user"
+
+# Load Credentials for Cloud9Role
+aws sts assume-role --role-arn "arn:aws:iam::469132580751:role/Cloud9Role" --role-session-name Cloud9Role --profile Cloud9Role > /dev/null
 
 # Set minion_id
 AWS_INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
