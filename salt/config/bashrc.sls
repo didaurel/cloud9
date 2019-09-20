@@ -25,3 +25,8 @@ bashrc.d:
     - user: ec2-user
 {% endfor %}
 
+
+# alias added for diff, ensure colordiff is installed
+colordiff:
+  pkg:
+    - latest
