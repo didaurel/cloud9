@@ -152,6 +152,11 @@ chown_phpd{{ php_version }}_dir:
 #>>>>> endfor <<<<<#
 {% endfor %}
 
+python_module_for_switch_script:
+  pip.installed:
+    - name: pyyaml
+    - bin_env: /usr/bin/pip-3.6
+
 cp_switch_script:
   file.managed:
     - name: /usr/bin/phpSwitchVersion

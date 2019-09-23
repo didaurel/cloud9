@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 import yaml
 import os
 
 stream = open("/etc/salt/grains", "r")
-grains = yaml.load(stream)
+grains = yaml.load(stream, Loader=yaml.FullLoader)
 php_version_grains = grains['php-fpm'][0]['version']
 
 def checkPHPVersionExist(version, php_version_grains):
@@ -23,7 +23,7 @@ while php_version == False:
     php_versions = ', '.join(str(x) for x in php_version_grains)
     print("Available PHP version are: " + php_versions)
     try:
-        php_version_input = int(raw_input("Which PHP version by default?\n"))
+        php_version_input = int(input("Which PHP version by default?\n"))
         php_version = checkPHPVersionExist(php_version_input, php_version_grains)
     except ValueError:
         print("Oops!  That was no valid number.  Try again...")
