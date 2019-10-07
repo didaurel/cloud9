@@ -73,6 +73,11 @@ services:
   node:
     image: fpfis/nodejs:10-wt
     container_name: node
+    depends_on:
+      - web
+    ports:
+      - 3000:3000
     volumes:
       - /home/ec2-user/environment/euwebtoolsws:/opt/nodejs
       - /mnt/docker/logs/node:/var/log
+    restart: always
