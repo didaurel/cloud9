@@ -32,6 +32,7 @@ services:
       - ALLOWOVERRIDE=All
       - PHP_DISPLAY_ERRORS=On
       - ENVIRONMENT=dev
+      - APACHE_EXTRA_CONF_DIR=/data/conf
     depends_on:
       - mysql
     ports:
@@ -39,6 +40,7 @@ services:
     volumes:
       - /mnt/docker/logs/httpd:/var/log
       - /home/ec2-user/environment:/var/www/html
+      - /home/ec2-user/.config/httpd:/data/conf
       - /mnt/docker/tmp/composer:/cache
     restart: always
   mysql:
@@ -79,5 +81,6 @@ services:
       - 3000:3000
     volumes:
       - /home/ec2-user/environment/euwebtoolsws:/opt/nodejs
+      - /home/ec2-user/environment/euwebtools/rest/html2m:/opt/nodejs/rest/html2m
       - /mnt/docker/logs/node:/var/log
     restart: always
