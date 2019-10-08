@@ -43,7 +43,7 @@ for service in "elasticsearch:9200" "cerebro:9000"; do
 done
 
 if ((`docker ps | grep couchdb | wc -l` != "0")); then
-  if [[ ! "`curl -s "http://127.0.0.1:5984/"`" !~ Welcome ]]
+  if [[ ! "`curl -s "http://127.0.0.1:5984/"`" =~ Welcome ]]
   then
     echo "Fail to connect : couchdb"; exit 76
   fi
