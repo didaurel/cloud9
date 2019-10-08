@@ -24,12 +24,11 @@
   file.directory:
     - user:  ec2-user
     - group: ec2-user
-/mnt/docker/datas/elasticsearch:
+{% for directory in ['/mnt/docker/datas/elasticsearch','/mnt/docker/logs/elasticsearch'] %}
+{{ directory }}:
   file.directory:
     - user:  1000
-/mnt/docker/logs/elasticsearch:
-  file.directory:
-    - user:  1000
+{% endfor %}
 /mnt/docker/webtools-docker-compose.yml:
   file.managed:
     - template: jinja
