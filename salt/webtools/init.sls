@@ -47,7 +47,9 @@
       - file: /home/ec2-user/.config/httpd
 start-containers:
   cmd.run:
-    - name: /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml up -d --force-recreate
+    - name: |
+        /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml pull
+        /usr/local/bin/docker-compose -f /mnt/docker/webtools-docker-compose.yml up -d --force-recreate
     - require:
       - file: /mnt/docker/webtools-docker-compose.yml
       - file: /home/ec2-user/.config/httpd/euwebtoolsws.conf
