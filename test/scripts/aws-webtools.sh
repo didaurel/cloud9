@@ -42,6 +42,15 @@ for service in "elasticsearch:9200" "cerebro:9000"; do
   fi
 done
 
+if ((`docker ps | grep couchdb | wc -l` != "0")); then
+  if [[ ! "`curl -s "http://127.0.0.1:5984/"`" !~ Welcome ]]
+  then
+    echo "Fail to connect : couchdb"; exit 76
+  fi
+else
+    echo "Fail to start container : couchdb"; exit 71
+fi
+
 if ((`docker ps | grep web | wc -l` != "0")); then
   if [[ "`curl -s "http://127.0.0.1:8080/ping"`" != 'pong' ]]
   then

@@ -72,11 +72,23 @@ services:
       - /home/ec2-user/environment:/var/www/html
     tty: true
     restart: always
+  couchdb:
+    image: couchdb:2.3.1
+    container_name: couchdb
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    ports:
+      - 5984:5984
+    volumes:
+      - /mnt/docker/datas/couchdb:/opt/couchdb/data
+    restart: always
   node:
     image: fpfis/nodejs:10-wt
     container_name: node
     depends_on:
       - web
+      - couchdb
     ports:
       - 3000:3000
     volumes:
