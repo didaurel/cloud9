@@ -22,7 +22,7 @@ pipeline:
       - source: AWS_DEFAULT_REGION
         target: AWS_DEFAULT_REGION
     commands:
-      - ./lambdaPackageUpload.sh ${DRONE_DEPLOY_TO}
+      - ./lambdaPackageUpload.sh ${DRONE_BRANCH#lambda/}
     when:
       branch: lambda/*
       event: [ push ]
