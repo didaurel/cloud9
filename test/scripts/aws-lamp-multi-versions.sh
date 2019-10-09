@@ -115,11 +115,14 @@ fi
 ###   Test basic drupal 8 install   ###
 #######################################
 cd /home/ec2-user/environment
-composer create-project drupal-composer/drupal-project:8.x-dev drupal8 --no-interaction
+
+# Install drupal8 using php71
+composer71 create-project drupal-composer/drupal-project:8.x-dev drupal8 --no-interaction
 cd /home/ec2-user/environment/drupal8/web
 # If we use global drush, RedispatchToSiteLocal will call local drush with default php version (56). Use local drush with specified php version.
 /usr/bin/php71 ../vendor/bin/drush  site-install standard --db-url=mysql://root:@127.0.0.1:3306/drupal8 --site-name=Drupal8Test --yes
 echo -e "<?php\nphpinfo();" > /home/ec2-user/environment/drupal8/phpinfo.php
+
 #### Test drupal 8 and PHP 7.1
 echo "Test Drupal 8 and PHP 7.1"
 echo -e "<FilesMatch \.php$>\nSetHandler proxy:unix:/var/opt/remi/php71/run/php-fpm/default.sock|fcgi://localhost\n</FilesMatch>"  > /home/ec2-user/environment/drupal8/.htaccess
