@@ -9,10 +9,9 @@ Lambda scripts to manage cloud9 instances
 ## Instructions:
 
 
-Python scripts 2.7 without dependances.
+Python scripts 3.7 without dependances.
 
-lambda_function.py: tag EC2 Instances and volumes with the name of the cloud9 instance.
-Pattern: aws-cloud9-{Cloud9Name}-{Cloud9EnvId}
+lambda_function.py: Delete all sopped packer instance (tag:Name:packer-build* & instance-state-name:stopped)
 
 
 ## Developement
@@ -25,7 +24,7 @@ Script can be developed and tested on AWS Console > Lambda.
 Create zip package:
 
 ```
-pip2.7 install -r requirements.txt -t build
+pip install -r requirements.txt -t build
 cp lambda_function.py ./build/
 cd build
 zip -r my_app.zip .
@@ -33,6 +32,6 @@ zip -r my_app.zip .
 
 Upload zip to lambda function:
 ```
-aws lambda update-function-code --function-name "MyLambdaFunctionName" --zip-file fileb://my_app.zip
+aws lambda update-function-code --function-name "deletePackerEC2" --zip-file fileb://my_app.zip
 ```
 
