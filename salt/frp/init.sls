@@ -2,7 +2,10 @@
 
 # Get frp local name from EC2 instance tag 'Name'
 {% set instance_id = salt['cmd.run']('curl -s http://169.254.169.254/latest/meta-data/instance-id') %}
-{% set instance_name = salt['cmd.run']('aws ec2 describe-instances --instance-ids ' + instance_id + ' --output text --query \'Reservations[].Instances[].Tags[?Key==`Name`].Value[]\'', runas='ec2-user') %}
+
+{{ salt['cmd.run']('aws configure set region eu-west-1 --profile Cloud9Role', runas='ec2-user') }}
+{% set devNull = salt['cmd.run']('aws sts assume-role --duration-seconds 900 --role-arn arn:aws:iam::469132580751:role/Cloud9Role --role-session-name Cloud9Role --profile Cloud9Role', runas='ec2-user') %}
+{% set instance_name = salt['cmd.run']('aws ec2 describe-instances --instance-ids ' + instance_id + ' --profile Cloud9Role --output text --query \'Reservations[].Instances[].Tags[?Key==`Name`].Value[]\'', runas='ec2-user') %}
 {% set frp_name = instance_name | regex_replace('aws-cloud9-(.*)-[a-z0-9]{32}', '\\1', ignorecase=True)  %}
 
 create_frp_folder:
