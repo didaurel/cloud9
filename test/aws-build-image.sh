@@ -16,7 +16,7 @@ docker pull djfarrelly/maildev
 docker pull rediscommander/redis-commander
 docker pull redis
 docker pull dougw/novnc
-docker pull selenium/standalone-chrome-debug
+docker pull selenium/standalone-chrome-debug:3.141.5
 
 ###  Pre-fill composer cache  ### 
 # install needed tools
