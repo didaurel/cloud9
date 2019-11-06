@@ -68,10 +68,11 @@ services:
   cypress:
     image: cypress/browsers:chrome67
     container_name: cypress
+    working_dir: /home/ec2-user/environment
     volumes:
       - /mnt/docker/tmp/node/cache:/root/.npm
       - /mnt/docker/tmp/node/cypress:/root/.cache
-      - /home/ec2-user/environment:/var/www/html
+      - /home/ec2-user/environment:/home/ec2-user/environment
     tty: true
     restart: always
   couchdb:
@@ -88,6 +89,7 @@ services:
   node:
     image: fpfis/nodejs:10-wt
     container_name: node
+    working_dir: /opt/nodejs
     depends_on:
       - web
       - couchdb
