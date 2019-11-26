@@ -25,6 +25,10 @@ for region in regions_cli:
 
 def lambda_handler(event, context):
     
+    global START_DATE
+    if "START_DATE" in event:
+        START_DATE = event["START_DATE"]
+
     count = 0
     message = ""
     
