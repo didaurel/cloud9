@@ -5,6 +5,8 @@ import os
 import ConfigParser
 from botocore.vendored import requests
 
+START_DATE = 60
+
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -23,13 +25,16 @@ for region in regions_cli:
 
 def lambda_handler(event, context):
     
+    global START_DATE
+    if "START_DATE" in event:
+        START_DATE = event["START_DATE"]
+
     count = 0
     message = ""
     
-    #Set date - 2 month
-    start_date = datetime.datetime.today() - datetime.timedelta(days=60)
-    print("Start " + start_date.strftime("%A %d. %B %Y"))
-    
+    #Set date using START_DATE
+    start_date = datetime.datetime.today() - datetime.timedelta(days=START_DATE)
+    logger.info ("Check instances stated before " + start_date.strftime("%A %d. %B %Y"))
     for region in regions :
         
         ec2_res = boto3.resource('ec2', region_name = region)
@@ -49,23 +54,30 @@ def lambda_handler(event, context):
         regionReport = ""
         #Parse all instances which are running or stopped
         for instance in instances :
-            if(instance.launch_time.replace(tzinfo=None) < start_date):
-                count = count + 1
-                name = ""
-                for j in range(len(instance.tags)):
-                    if instance.tags[j]["Key"] == "Name":
-                        name = instance.tags[j]["Value"]
-                instance_description  = " --> " + name + " (" + instance.id + " / " + str(instance.launch_time.date()) + ") : " + instance.instance_type + "\n"
-                logger.info(instance_description)
-                regionReport = regionReport + instance_description
+            stopDate = ""
+            when = instance.state_transition_reason.split("(")
+            if len(when) > 1 :
+                stopDate = when[1].replace(")","").split(" ")[0]
+            if stopDate != "" :
+                if  datetime.datetime.strptime(stopDate, "%Y-%m-%d") < start_date :
+                #if(instance.launch_time.replace(tzinfo=None) < start_date):
+                    count = count + 1
+                    name = ""
+                    for j in range(len(instance.tags)):
+                        if instance.tags[j]["Key"] == "Name":
+                            name = instance.tags[j]["Value"]
+                    #instance_description  = " --> " + name + " (" + instance.id + " / " + str(instance.launch_time.date()) + ") : " + instance.instance_type + "\n"
+                    instance_description  = unichr(8226) + " " + name + " (" + instance.id + " / " + stopDate + ") : " + instance.instance_type + "\n"
+                    logger.info(instance_description)
+                    regionReport = regionReport + instance_description
         if not regionReport == "":
-            message = "### " + region + " \n" + regionReport + message
+            message = region.upper() + " \n" + regionReport + message
     
     if not message == "" :
-        message = "These " + str(count) + " instances have been stopped since more than 2 month :\n" + message
-        message = "########### ACCOUNT : " + accountName + " ###########\n" + message
+        message = "These " + str(count) + " instances have been stopped since more than "+ str(START_DATE) + " days:\n" + message
+        message = message + "\nPlease delete your old instances if you no longer use them."
+        #message = "########### ACCOUNT : " + accountName + " ###########\n" + message
     
-        print(message)
         logger.debug ("Message: {0}".format(message))
         logger.info ("Send slack message...")
         result = sendSlackMessage(message)
