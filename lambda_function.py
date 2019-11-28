@@ -1,6 +1,5 @@
 import boto3
 import requests
-import ConfigParser
 import os.path
 
 import logging
@@ -48,7 +47,7 @@ def lambda_handler(event, context):
         for cloud9ID in Cloud9ByOwners[Cloud9ByOwner]: 
           env.append (cloud9All[cloud9ID]["name"])
         
-        message += unichr(8226) + " User '%s' have %s environements: %s\n" % (username,len(Cloud9ByOwners[Cloud9ByOwner]),', '.join(env))
+        message += chr(8226) + " User '%s' have %s environements: %s\n" % (username,len(Cloud9ByOwners[Cloud9ByOwner]),', '.join(env))
         logger.info ("User '{0}' have multiple environments: {1}".format(username,', '.join(env)))
   message = "Only 1 Cloud9 environment is allowed by user. Please clean up your environments:\n" + message
   logger.debug ("Message: {0}".format(message))
@@ -62,17 +61,11 @@ def lambda_handler(event, context):
   
 
 def sendSlackMessage (message) :
-  CONFIGFILE=  os.path.dirname(__file__) + "/lambda_config.ini"
-  if not os.path.isfile(CONFIGFILE):
-    logger.error("Config file not fount at '{0}'".format(CONFIGFILE))
-    return False
-  config = ConfigParser.ConfigParser()
-  config.read(CONFIGFILE)
+  SLACK_URL=os.environ['webhook_URL']
+  SLACK_CHANNEL=os.environ['channel']
+  SLACK_USERNAME=os.environ['username']
+  SLACK_ICON=os.environ['icon_emoji']
   try:
-    SLACK_URL=config.get('slack', 'webhook_URL')
-    SLACK_CHANNEL=config.get('slack', 'channel')
-    SLACK_USERNAME=config.get('slack', 'username')
-    SLACK_ICON = config.get('slack', 'icon_emoji')
     response = { "text" : message, "channel": SLACK_CHANNEL, "username": SLACK_USERNAME, "icon_emoji": SLACK_ICON}
     slack_response = requests.post(SLACK_URL,json=response, headers={'Content-Type': 'application/json'})
     return slack_response.status_code

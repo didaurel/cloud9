@@ -1,4 +1,3 @@
-#!/bin/bash
 
 SCRIPT_PATH=$(readlink -f $0)
 SCRIPT_DIR=`dirname $SCRIPT_PATH`
@@ -11,7 +10,7 @@ rm -Rf $ZIP_FILE
 rm -Rf $BUILD_DIR
 mkdir $BUILD_DIR
 
-python2.7 -m pip install -r requirements.txt -t $BUILD_DIR
+python -m pip install -r requirements.txt -t $BUILD_DIR
 cp $PYTHON_SCRIPT "$BUILD_DIR/"
 cp lambda_config.dist.ini "$BUILD_DIR/"
 
