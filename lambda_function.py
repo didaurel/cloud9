@@ -1,9 +1,7 @@
-import json
 import boto3
 import datetime
 import os
-import ConfigParser
-from botocore.vendored import requests
+import requests
 
 START_DATE = 60
 
@@ -67,7 +65,7 @@ def lambda_handler(event, context):
                         if instance.tags[j]["Key"] == "Name":
                             name = instance.tags[j]["Value"]
                     #instance_description  = " --> " + name + " (" + instance.id + " / " + str(instance.launch_time.date()) + ") : " + instance.instance_type + "\n"
-                    instance_description  = unichr(8226) + " " + name + " (" + instance.id + " / " + stopDate + ") : " + instance.instance_type + "\n"
+                    instance_description  = chr(8226) + " " + name + " (" + instance.id + " / " + stopDate + ") : " + instance.instance_type + "\n"
                     logger.info(instance_description)
                     regionReport = regionReport + instance_description
         if not regionReport == "":
@@ -88,17 +86,11 @@ def lambda_handler(event, context):
             logger.error ("Slack notification error, return code: %d" % (result))
     
 def sendSlackMessage (message) :
-    CONFIGFILE=  os.path.dirname(__file__) + "/lambda_config.ini"
-    if not os.path.isfile(CONFIGFILE):
-        logger.error("Config file not fount at '{0}'".format(CONFIGFILE))
-        return False
-    config = ConfigParser.ConfigParser()
-    config.read(CONFIGFILE)
+    SLACK_URL=os.environ['webhook_URL']
+    SLACK_CHANNEL=os.environ['channel']
+    SLACK_USERNAME=os.environ['username']
+    SLACK_ICON=os.environ['icon_emoji']
     try:
-        SLACK_URL=config.get('slack', 'webhook_URL')
-        SLACK_CHANNEL=config.get('slack', 'channel')
-        SLACK_USERNAME=config.get('slack', 'username')
-        SLACK_ICON = config.get('slack', 'icon_emoji')
         response = { "text" : message, "channel": SLACK_CHANNEL, "username": SLACK_USERNAME, "icon_emoji": SLACK_ICON}
         slack_response = requests.post(SLACK_URL,json=response, headers={'Content-Type': 'application/json'})
         return slack_response.status_code
