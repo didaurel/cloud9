@@ -25,4 +25,3 @@ if [ "$?" != "0" ];then
   printAvailableLambdaFunction
   exit 13
 fi
-
