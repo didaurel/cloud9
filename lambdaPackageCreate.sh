@@ -10,7 +10,7 @@ rm -Rf $ZIP_FILE
 rm -Rf $BUILD_DIR
 mkdir $BUILD_DIR
 
-pip2.7 install -r requirements.txt -t $BUILD_DIR
+python -m pip install -r requirements.txt -t $BUILD_DIR
 cp $PYTHON_SCRIPT "$BUILD_DIR/"
 
 cd "$BUILD_DIR"
