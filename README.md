@@ -9,9 +9,9 @@ Lambda scripts to manage cloud9 instances
 ## Instructions:
 
 
-Python scripts 2.7 without dependances.
+Python scripts 3.8 with request dependances.
 
-lambdaFunction.py: enlarge EC2 volume of Cloud9 environement. Skip resize if 'noEBSresize' present on C9 description.
+lambdaFunction.py: Send slack notification for EC2 cloud9 instances started more than 8 hours.
 
 Script triggered by [CloudWatch Event](cloudWatch.Event)
 
