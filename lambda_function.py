@@ -22,7 +22,7 @@ if (debugMode):
 
 def lambda_handler(event, context):
   logger.info(event)
-  if (event['detail']['event'] == "createVolume" ):
+  if ("detail" in event and "event" in event['detail'] and event['detail']['event'] == "createVolume" ):
     if (event['detail']['result'] != "available"):
       logger.error("Volume not ready")
     else:

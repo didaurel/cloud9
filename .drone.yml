@@ -1,13 +1,34 @@
 pipeline:
   python_syntax_check:
-    image: python:2.7
+    image: python:3.8
     commands:
       - python -m py_compile lambda_function.py
+    when:
+      branch: lambda/*
+      event: [ push , pull_request ]
 
   build-test:
-    image: python:2.7
+    image: python:3.8
     commands:
       - apt-get update --yes
       - apt-get install zip --yes
       - ./lambdaPackageCreate.sh
       - ls my_app.zip
+    when:
+      branch: lambda/*
+      event: [ push , pull_request ]
+
+  deployment-to-aws:
+    image: mesosphere/aws-cli
+    secrets:
+      - source: AWS_LAMBDA_ACCESS_KEY_ID
+        target: AWS_ACCESS_KEY_ID
+      - source: AWS_LAMBDA_SECRET_ACCESS_KEY
+        target: AWS_SECRET_ACCESS_KEY
+      - source: AWS_DEFAULT_REGION
+        target: AWS_DEFAULT_REGION
+    commands:
+      - ./lambdaPackageUpload.sh ${DRONE_BRANCH#lambda/}
+    when:
+      branch: lambda/*
+      event: [ push ]
