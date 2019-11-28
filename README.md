@@ -9,7 +9,7 @@ Lambda scripts to manage cloud9 instances
 ## Instructions:
 
 
-Python scripts 2.7 without dependances.
+Python scripts 3.8 without dependances.
 
 lambda_function.py: Stop all running EC2 instances of Cloud9 Environements.
 Stop Instance with pattern: "aws-cloud9*"
