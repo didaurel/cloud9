@@ -9,10 +9,9 @@ Lambda scripts to manage cloud9 instances
 ## Instructions:
 
 
-Python scripts 2.7 without dependances.
+Python scripts 3.8 without dependances.
 
-lambda_function.py: tag EC2 Instances and volumes with the name of the cloud9 instance.
-Pattern: aws-cloud9-{Cloud9Name}-{Cloud9EnvId}
+lambda_function.py: attach IAM roles to cloud9 instnaces.
 
 
 ## Developement
